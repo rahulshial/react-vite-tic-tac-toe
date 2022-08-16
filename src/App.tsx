@@ -1,15 +1,62 @@
 import React, { useState, useEffect } from 'react'
 import Square from './components/Square';
+import { INITIAL_GAME_STATE, WINNING_COMBOS } from './constants/constants';
 
 function App() {
-  const INITIAL_GAME_STATE = new Array(9).fill("");
+  // const INITIAL_GAME_STATE = new Array(9).fill("");
+
   const [gameState, setGameState] = useState(INITIAL_GAME_STATE);
   const [currentPlayer, setCurrentPlayer] = useState("X")
 
   useEffect(() => {
-  changePlayer()
+    checkForWinner()
+  // changePlayer()
   }, [gameState])
   
+  const resetBoard = () => {
+    setGameState(INITIAL_GAME_STATE)
+  }
+
+  const handleWin = () => {
+    window.alert(`Congrats player ${currentPlayer}! You are the winner!`);
+    resetBoard()
+  }
+  
+  const handleDraw = () => {
+    window.alert('The game ended in a draw')
+    resetBoard()
+  }
+
+  const checkForWinner = () => {
+    let roundWon = false;
+    for (let i = 0; i < WINNING_COMBOS.length; i++) {
+      let a = gameState[WINNING_COMBOS[i][0]]
+      let b = gameState[WINNING_COMBOS[i][1]]
+      let c = gameState[WINNING_COMBOS[i][2]]
+      
+      if([a, b, c].includes("")) continue;
+
+      if(a === b && b === c) {
+        roundWon = true
+        break
+      }
+    }
+
+    if(roundWon) {
+      setTimeout(() => handleWin(), 500)
+      return
+    }
+    
+    if(!gameState.includes("")) {
+      setTimeout(() => handleDraw(), 500)
+      return
+    }
+
+    changePlayer();
+  }
+
+
+
   const changePlayer = () => {
     setCurrentPlayer(currentPlayer === "X" ? "O" : "X")
   }
