@@ -1,5 +1,5 @@
-import Scores from '@components/Scores';
 import React, { useState, useEffect } from 'react'
+import Scores from '@components/Scores';
 import Square from './components/Square';
 import { INITIAL_GAME_STATE, WINNING_COMBOS, INITIAL_SCORES } from './constants/constants';
 
@@ -7,13 +7,6 @@ function App() {
   const [gameState, setGameState] = useState(INITIAL_GAME_STATE);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [scores, setScores] = useState(INITIAL_SCORES);
-
-  useEffect(() => {
-    const storedScores = localStorage.getItem("scores");
-    if (storedScores) {
-      setScores(JSON.parse(storedScores));
-    }
-  }, []);
 
   useEffect(() => {
     if (gameState === INITIAL_GAME_STATE) {
@@ -25,21 +18,19 @@ function App() {
   const resetBoard = () => {
     setGameState(INITIAL_GAME_STATE)
   }
-
   const handleWin = () => {
     window.alert(`Congrats player ${currentPlayer}! You are the winner!`);
-    const newPlayerScore = scores[currentPlayer] + 1;
-    const newScores = { ...scores };
-    newScores[currentPlayer] = newPlayerScore;
-    setScores(newScores);
-    localStorage.setItem("scores", JSON.stringify(newScores));
-
+    setScores(prev => {
+      return {...prev, [currentPlayer]: prev[currentPlayer] + 1}
+    })
     resetBoard()
+    changePlayer();
   }
   
   const handleDraw = () => {
     window.alert('The game ended in a draw')
     resetBoard()
+    changePlayer();
   }
 
   const checkForWinner = () => {
@@ -66,7 +57,6 @@ function App() {
       setTimeout(() => handleDraw(), 500)
       return
     }
-
     changePlayer();
   }
 
@@ -77,7 +67,7 @@ function App() {
     const cellIndex = Number(event.target.getAttribute('data-cell-index'))
     if(!gameState[cellIndex]) {
       const newValues = [...gameState]
-      newValues[cellIndex] = currentPlayer
+      newValues.splice(cellIndex, 1, currentPlayer)
       setGameState(newValues)
     }
   }
